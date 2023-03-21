@@ -1,8 +1,6 @@
 import styled from 'styled-components';
 
 export const Container = styled.div`
-  /* position: relative; */
-  /* height: 100vh; */
   & .gallery {
     display: grid;
     max-width: calc(100vw - 48px);

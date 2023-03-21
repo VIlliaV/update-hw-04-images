@@ -1,19 +1,60 @@
 import { Component } from 'react';
 import { getResponse } from '../../utils/api';
+import PropTypes from 'prop-types';
 
 import { ImageGalleryItem } from '../ImageGalleryItem/ImageGalleryItem';
 import { Container } from './ImageGallery.styled';
-import { Button } from '../Button/Button';
+import { ButtonLoad } from '../Button/Button';
 import { Loader } from '../Loader/Loader';
-import noImg from '../../noimage.png'
+import noImg from '../../image/noimage.png';
+import { Modal } from '../Modal/Modal';
+
+const STATUS = {
+  pending: 'pending',
+  loading: 'loading',
+};
 
 export class ImageGallery extends Component {
-state = {
+  state = {
     images: [],
     multiplierForPage: 1,
-  status: 'pending',
-    totalImages: 0
+    status: STATUS.pending,
+    totalImages: 0,
+    isModal: null,
   };
+
+  componentDidUpdate(prevProps, prevState) {
+    const { searchWord } = this.props;
+    const prevSearchWord = prevProps.searchWord;
+    const { multiplierForPage } = this.state;
+    const prevMultiplierForPage = prevState.multiplierForPage;
+
+    if (searchWord !== prevSearchWord) this.reset();
+    if (
+      searchWord !== prevSearchWord ||
+      multiplierForPage !== prevMultiplierForPage
+    ) {
+      this.setState({ status: STATUS.loading });
+      // setTimeout  - для тесту, чи все працює
+      setTimeout(() => {
+        getResponse(searchWord, multiplierForPage)
+          .then(response => {
+            const { hits: arrImages, total: totalImages } = response.data;
+            if (totalImages !== 0) {
+              this.setState({ images: arrImages, totalImages });
+            } else {
+              this.reset();
+            }
+          })
+          .catch(error => {
+            alert(error.message);
+          })
+          .finally(() => {
+            this.setState({ status: STATUS.pending });
+          });
+      }, 1000);
+    }
+  }
 
   reset = () => {
     this.setState({ images: [], multiplierForPage: 1, totalImages: 0 });
@@ -24,60 +65,49 @@ state = {
       multiplierForPage: prevState.multiplierForPage + 1,
     }));
   };
+  handleModal = largeImageURL => {
+    this.setState({ isModal: largeImageURL });
+  };
 
-  componentDidUpdate(prevProps, prevState) {
-    if (this.props.searchWord !== prevProps.searchWord) this.reset();
-    if (
-      this.props.searchWord !== prevProps.searchWord
-      || this.state.multiplierForPage !== prevState.multiplierForPage
-    ) {
- 
-      this.setState({ status: 'loading' });
- setTimeout(()=>{ getResponse(this.props.searchWord, this.state.multiplierForPage)
-        .then(response => {
-          if (response.data.total !== 0) {
-            this.setState({ images: response.data.hits });
-            this.setState({totalImages: response.data.total})
-           
-          } else {
-            this.reset();
-            
-          }
-        })
-        .catch(error => {
-          alert(error.message);
-        }).finally(() => {
-          this.setState({ status: 'pending' })
-          console.log('final')
-         
-        }) },1500)
-        ;
-      
-    }
-  }
+  closeModal = () => {
+    this.setState({ isModal: null });
+  };
 
   render() {
-    const isloadMore = this.state.multiplierForPage;
-    const status = this.state.status;
-    console.log(status)
-    console.log(noImg)
+    const { status, isModal, multiplierForPage, images, totalImages } =
+      this.state;
+    const isNoImages = images.length === 0 && status === STATUS.pending;
+    const isMoreImages =
+      multiplierForPage > 0 && multiplierForPage * 12 < totalImages;
     return (
       <Container>
+        {isNoImages ? (
+          <img src={noImg} alt="no images" />
+        ) : (
+          <ul className="gallery">
+            {images.map(image => {
+              return (
+                <ImageGalleryItem
+                  image={image}
+                  key={image.id}
+                  handleModal={this.handleModal}
+                />
+              );
+            })}
+          </ul>
+        )}
 
-         
-{this.state.images.length === 0 && status==='pending' ? <img src={noImg}/> : 
-       <ul className="gallery"> { this.state.images.map(image => {
-          return <ImageGalleryItem image={image} key={image.id}/>;
-        })} </ul>}
-       
-        
-     
-        {status === 'loading' ? (
+        {status === STATUS.loading ? (
           <Loader />
-        ) : (isloadMore > 0 && isloadMore * 12 < this.state.totalImages) && <Button loadMore={this.loadMore}></Button>}
-       
+        ) : (
+          isMoreImages && <ButtonLoad loadMore={this.loadMore} />
+        )}
+        {isModal && <Modal largeImage={isModal} closeModal={this.closeModal} />}
       </Container>
-      
     );
-  };
+  }
 }
+
+ImageGallery.propTypes = {
+  searchWord: PropTypes.string,
+};
