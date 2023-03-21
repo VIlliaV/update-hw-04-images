@@ -37,24 +37,28 @@ export class ImageGallery extends Component {
       this.setState({ status: STATUS.loading });
       // setTimeout  - для тесту, чи все працює
       setTimeout(() => {
-        getResponse(searchWord, multiplierForPage)
-          .then(response => {
-            const { hits: arrImages, total: totalImages } = response.data;
-            if (totalImages !== 0) {
-              this.setState({ images: arrImages, totalImages });
-            } else {
-              this.reset();
-            }
-          })
-          .catch(error => {
-            alert(error.message);
-          })
-          .finally(() => {
-            this.setState({ status: STATUS.pending });
-          });
+        this.fetchImages(searchWord, multiplierForPage);
       }, 1000);
     }
   }
+
+  fetchImages = (searchWord, multiplierForPage) => {
+    getResponse(searchWord, multiplierForPage)
+      .then(response => {
+        const { hits: arrImages, total: totalImages } = response.data;
+        if (totalImages !== 0) {
+          this.setState({ images: arrImages, totalImages });
+        } else {
+          this.reset();
+        }
+      })
+      .catch(error => {
+        alert(error.message);
+      })
+      .finally(() => {
+        this.setState({ status: STATUS.pending });
+      });
+  };
 
   reset = () => {
     this.setState({ images: [], multiplierForPage: 1, totalImages: 0 });
