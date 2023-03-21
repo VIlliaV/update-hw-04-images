@@ -69,6 +69,7 @@ export class ImageGallery extends Component {
       multiplierForPage: prevState.multiplierForPage + 1,
     }));
   };
+
   handleModal = largeImageURL => {
     this.setState({ isModal: largeImageURL });
   };
@@ -83,6 +84,7 @@ export class ImageGallery extends Component {
     const isNoImages = images.length === 0 && status === STATUS.pending;
     const isMoreImages =
       multiplierForPage > 0 && multiplierForPage * 12 < totalImages;
+
     return (
       <Container>
         {isNoImages ? (
@@ -106,6 +108,7 @@ export class ImageGallery extends Component {
         ) : (
           isMoreImages && <ButtonLoad loadMore={this.loadMore} />
         )}
+
         {isModal && <Modal largeImage={isModal} closeModal={this.closeModal} />}
       </Container>
     );

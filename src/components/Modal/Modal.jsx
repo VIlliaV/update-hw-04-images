@@ -7,15 +7,17 @@ export class Modal extends Component {
   componentDidMount() {
     window.addEventListener('keydown', this.handleKeyESC);
   }
+
   componentWillUnmount() {
     window.removeEventListener('keydown', this.handleKeyESC);
   }
 
-  handleClick = e => {
-    if (e.target.nodeName === 'DIV') this.props.closeModal();
+  handleClick = ({ target: { nodeName } }) => {
+    if (nodeName === 'DIV') this.props.closeModal();
   };
-  handleKeyESC = e => {
-    if (e.code === 'Escape') this.props.closeModal();
+
+  handleKeyESC = ({ code }) => {
+    if (code === 'Escape') this.props.closeModal();
   };
 
   render() {
