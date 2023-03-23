@@ -29,16 +29,21 @@ export class ImageGallery extends Component {
     const { multiplierForPage } = this.state;
     const prevMultiplierForPage = prevState.multiplierForPage;
 
-    if (searchWord !== prevSearchWord) this.reset();
+    if (
+      searchWord !== prevSearchWord
+      // ||
+      // multiplierForPage < prevMultiplierForPage
+    ) {
+      this.reset();
+      console.log('🚀 ~ multiplierForPage:', multiplierForPage);
+    }
+
     if (
       searchWord !== prevSearchWord ||
       multiplierForPage !== prevMultiplierForPage
     ) {
       this.setState({ status: STATUS.loading });
-      // setTimeout  - для тесту, чи все працює
-      setTimeout(() => {
-        this.fetchImages(searchWord, multiplierForPage);
-      }, 1000);
+      this.fetchImages(searchWord, multiplierForPage);
     }
   }
 
