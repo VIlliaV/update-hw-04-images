@@ -23,6 +23,11 @@ export class ImageGallery extends Component {
     isModal: null,
   };
 
+  shouldComponentUpdate(_, nextState) {
+    if (nextState.multiplierForPage < this.state.multiplierForPage)
+      return false;
+    else return true;
+  }
   componentDidUpdate(prevProps, prevState) {
     const { searchWord } = this.props;
     const prevSearchWord = prevProps.searchWord;
@@ -30,21 +35,18 @@ export class ImageGallery extends Component {
     const prevMultiplierForPage = prevState.multiplierForPage;
 
     if (
-      searchWord !== prevSearchWord
-      // ||
-      // multiplierForPage < prevMultiplierForPage
-    ) {
-      this.reset();
-      console.log('🚀 ~ multiplierForPage:', multiplierForPage);
-    }
-
-    if (
       searchWord !== prevSearchWord ||
       multiplierForPage !== prevMultiplierForPage
     ) {
       this.setState({ status: STATUS.loading });
-      this.fetchImages(searchWord, multiplierForPage);
     }
+
+    if (searchWord !== prevSearchWord) {
+      this.reset();
+      this.fetchImages(searchWord);
+    }
+    if (multiplierForPage !== prevMultiplierForPage)
+      this.fetchImages(searchWord, multiplierForPage);
   }
 
   fetchImages = (searchWord, multiplierForPage) => {
