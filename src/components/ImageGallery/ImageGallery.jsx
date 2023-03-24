@@ -54,7 +54,12 @@ export class ImageGallery extends Component {
       .then(response => {
         const { hits: arrImages, total: totalImages } = response.data;
         if (totalImages !== 0) {
-          this.setState({ images: arrImages, totalImages });
+          this.setState(prevState => {
+            return {
+              images: [...prevState.images, ...arrImages],
+              totalImages,
+            };
+          });
         } else {
           this.reset();
         }
