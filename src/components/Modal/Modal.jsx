@@ -14,6 +14,7 @@ export const Modal = ({ closeModal, largeImage }) => {
   useEffect(() => {
     window.addEventListener('keydown', handleKeyESC);
   }, [handleKeyESC]);
+
   useEffect(() => {
     return () => {
       window.removeEventListener('keydown', handleKeyESC);

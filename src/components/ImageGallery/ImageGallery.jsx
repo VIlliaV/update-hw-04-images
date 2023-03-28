@@ -18,10 +18,10 @@ const STATUS = {
 
 export const ImageGallery = ({ searchWord }) => {
   const [images, setImages] = useState([]);
-  const [multiplierForPage, setMultiplierForPage] = useState(1);
   const [isModal, setIsModal] = useState(null);
   const [status, setStatus] = useState(STATUS.pending);
 
+  const multiplierForPage = useRef(1);
   const isNoImages = useRef(true);
   const isMoreImages = useRef(false);
 
@@ -36,9 +36,7 @@ export const ImageGallery = ({ searchWord }) => {
           }
           isNoImages.current = false;
           setImages(prevState => [...prevState, ...arrImages]);
-        } else {
-          reset();
-        }
+        } else reset();
       })
       .catch(error => {
         toast.error(`${error.message}`);
@@ -49,30 +47,21 @@ export const ImageGallery = ({ searchWord }) => {
   }, []);
 
   useEffect(() => {
-
-    if (searchWord === '') return;
     reset();
+    if (searchWord === '') return;
     fetchImages(searchWord, 1);
   }, [fetchImages, searchWord]);
 
-  useEffect(() => {
-    console.log('1 render Mult', multiplierForPage);
-    if (multiplierForPage === 1) return;
-    console.log('11111 render Mult', multiplierForPage);
-  }, [multiplierForPage]);
-
-  function reset() {
+  const reset = () => {
     isMoreImages.current = false;
     isNoImages.current = true;
-
-    setMultiplierForPage(1);
+    multiplierForPage.current = 1;
     setImages([]);
-  }
+  };
 
   const loadMore = () => {
-    const nextMulti = multiplierForPage + 1;
-    setMultiplierForPage(nextMulti);
-    fetchImages(searchWord, nextMulti);
+    multiplierForPage.current += 1;
+    fetchImages(searchWord, multiplierForPage.current);
   };
 
   const handleModal = largeImageURL => {
@@ -85,7 +74,6 @@ export const ImageGallery = ({ searchWord }) => {
 
   return (
     <Container>
-      {console.log('Render')}
       <Toaster />
       {isNoImages.current ? (
         <img src={noImg} alt="no images" />
