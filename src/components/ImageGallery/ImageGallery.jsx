@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { getResponse } from '../../utils/api';
 import PropTypes from 'prop-types';
 import toast, { Toaster } from 'react-hot-toast';
@@ -9,14 +9,16 @@ import { ButtonLoad } from '../Button/Button';
 import { Loader } from '../Loader/Loader';
 import noImg from '../../image/noimage.png';
 import { Modal } from '../Modal/Modal';
-import { useCallback } from 'react';
+import { useContextQuery } from '../Context';
 
 const STATUS = {
   pending: 'pending',
   loading: 'loading',
 };
 
-export const ImageGallery = ({ searchWord }) => {
+export const ImageGallery = () => {
+  const { searchWord } = useContextQuery();
+
   const [images, setImages] = useState([]);
   const [isModal, setIsModal] = useState(null);
   const [status, setStatus] = useState(STATUS.pending);

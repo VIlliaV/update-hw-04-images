@@ -1,18 +1,19 @@
 import { useState } from 'react';
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 
 import { Header } from './Searchbar.styled';
+import { useContextQuery } from '../Context';
 
-export const Searchbar = ({ onSubmit }) => {
+export const Searchbar = () => {
   const [query, setQuery] = useState('');
-
+  const { setQueryContext } = useContextQuery();
   const handleInput = ({ target: { value } }) => {
     setQuery(value);
   };
 
   const handleSubmit = e => {
     e.preventDefault();
-    onSubmit(query.trim());
+    setQueryContext(query.trim());
   };
 
   return (
@@ -35,8 +36,4 @@ export const Searchbar = ({ onSubmit }) => {
       </form>
     </Header>
   );
-};
-
-Searchbar.propTypes = {
-  onSubmit: PropTypes.func.isRequired,
 };
